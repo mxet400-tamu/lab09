@@ -166,3 +166,4 @@ Before completing your lab report, verify:
 * [ ] At least 2 Cartesian waypoints planned and executed smoothly on the robot arm.
 * [ ] Captured `/joint_states` output for your lab report.
 * [ ] Answered all Lab Questions in your report (IP addressing, message types, and IK vs FK).
+
