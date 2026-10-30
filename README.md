@@ -40,6 +40,13 @@ lab09/
 
 ## 3. Getting Started & Workspace Build
 
+First, install the UR driver prerequisites (if not already installed):
+
+```bash
+sudo apt update
+sudo apt install -y ros-jazzy-ur-client-library ros-jazzy-ur-robot-driver
+```
+
 Build the package from your workspace root:
 
 ```bash
@@ -61,18 +68,22 @@ source install/setup.bash
 
 #### Step 1: Network Configuration
 1. Connect your workstation/laptop to the robot control box via a physical Ethernet cable.
-2. Ensure your laptop's Ethernet adapter is configured statically on the `192.168.1.0/24` subnet:
-   * **IP Address**: `192.168.1.10` (or `192.168.1.<laptop_number>`)
+2. If connected to campus Wi-Fi at the same time, ensure ROS 2 discovery is set to localhost in `~/.bashrc`:
+   ```bash
+   export ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST
+   ```
+3. Ensure your laptop's Ethernet adapter is configured statically on the `192.168.1.0/24` subnet:
+   * **IP Address**: `192.168.1.5` (or `192.168.1.<laptop_number>`)
    * **Subnet Mask**: `255.255.255.0`
    * **Gateway**: `192.168.1.1` (or leave blank)
-3. Disable Linux firewall if running native Ubuntu:
+4. Disable Linux firewall (mandatory to allow incoming reverse connection on port 50002):
    ```bash
-   sudo systemctl disable --now firewalld 2>/dev/null || true
+   sudo ufw disable
    ```
 
 #### Step 2: Teach Pendant (PolyScope) Setup
 1. On the UR3e Teach Pendant, navigate to: **Installation > URCaps > External Control**.
-2. Verify "Remote host IP" matches your laptop's Ethernet IP (e.g. `192.168.1.10`).
+2. Verify "Remote host IP" matches your laptop's Ethernet IP (e.g. `192.168.1.5`) and custom port is `50002`.
 3. Open or create a program named `Laptop Connection` containing only the `External Control` program node.
 4. **Do NOT press Play yet.**
 
@@ -91,8 +102,11 @@ ros2 launch mxet_ur_launch ex-ur3e-3.launch.py robot_ip:=192.168.1.33 ur_type:="
 ```
 
 Once the terminal prints:
-`[urscript_interface]: Robot connected to reverse interface`
-press **PLAY** on the Teach Pendant. The terminal will report successful RTDE synchronization.
+```text
+[ros2_control_node-1] [INFO] [UR_Client_Library:]: Robot connected to reverse interface. Ready to receive control commands.
+[spawner-6] [INFO] [spawner_scaled_joint_trajectory_controller]: Configured and activated scaled_joint_trajectory_controller
+```
+press **PLAY** on the Teach Pendant. The terminal will report successful RTDE synchronization and PolyScope's play icon will stay active (green).
 
 #### Step 4: Launch MoveIt 2 & RViz
 In **Terminal 2**:

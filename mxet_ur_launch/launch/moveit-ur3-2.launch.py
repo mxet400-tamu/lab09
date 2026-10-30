@@ -154,13 +154,17 @@ def launch_setup(context, *args, **kwargs):
     )
     robot_description_semantic = {"robot_description_semantic": robot_description_semantic_content}
 
-    robot_description_kinematics = PathJoinSubstitution(
-        [FindPackageShare(moveit_config_package), "config", "kinematics.yaml"]
-    )
+    robot_description_kinematics = {
+        "robot_description_kinematics": load_yaml(
+            moveit_config_package.perform(context), "config/kinematics.yaml"
+        )
+    }
 
-    # robot_description_planning = {
-    # "robot_description_planning": load_yaml_abs(str(joint_limit_params.perform(context)))
-    # }
+    robot_description_planning = {
+        "robot_description_planning": load_yaml(
+            moveit_config_package.perform(context), "config/joint_limits.yaml"
+        )
+    }
 
     # Planning Configuration
     ompl_planning_pipeline_config = {
@@ -194,6 +198,13 @@ def launch_setup(context, *args, **kwargs):
         "trajectory_execution.allowed_execution_duration_scaling": 1.2,
         "trajectory_execution.allowed_goal_duration_margin": 0.5,
         "trajectory_execution.allowed_start_tolerance": 0.01,
+        "trajectory_execution.execution_duration_monitoring": False,
+        "trajectory_execution": {
+            "allowed_execution_duration_scaling": 1.2,
+            "allowed_goal_duration_margin": 0.5,
+            "allowed_start_tolerance": 0.01,
+            "execution_duration_monitoring": False,
+        },
     }
 
     planning_scene_monitor_parameters = {
@@ -217,7 +228,7 @@ def launch_setup(context, *args, **kwargs):
             robot_description,
             robot_description_semantic,
             robot_description_kinematics,
-            # robot_description_planning,
+            robot_description_planning,
             ompl_planning_pipeline_config,
             trajectory_execution,
             moveit_controllers,
@@ -229,7 +240,7 @@ def launch_setup(context, *args, **kwargs):
 
     # rviz with moveit configuration
     rviz_config_file = PathJoinSubstitution(
-        [FindPackageShare(moveit_config_package), "rviz", "view_robot.rviz"]
+        [FindPackageShare(moveit_config_package), "config", "moveit.rviz"]
     )
     rviz_node = Node(
         package="rviz2",
@@ -243,7 +254,7 @@ def launch_setup(context, *args, **kwargs):
             robot_description_semantic,
             ompl_planning_pipeline_config,
             robot_description_kinematics,
-            # robot_description_planning,
+            robot_description_planning,
             warehouse_ros_config,
         ],
     )
@@ -254,7 +265,7 @@ def launch_setup(context, *args, **kwargs):
     servo_node = Node(
         package="moveit_servo",
         condition=IfCondition(launch_servo),
-        executable="servo_node_main",
+        executable="servo_node",
         parameters=[
             servo_params,
             robot_description,

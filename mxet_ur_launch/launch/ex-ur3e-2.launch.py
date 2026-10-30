@@ -128,6 +128,9 @@ def launch_setup(context, *args, **kwargs):
             "name:=",
             ur_type,
             " ",
+            "ur_type:=",
+            ur_type,
+            " ",
             "script_filename:=",
             script_filename,
             " ",
@@ -216,8 +219,8 @@ def launch_setup(context, *args, **kwargs):
     )
 
     ur_control_node = Node(
-        package="ur_robot_driver",
-        executable="ur_ros2_control_node",
+        package="controller_manager",
+        executable="ros2_control_node",
         parameters=[
             robot_description,
             update_rate_config_file,
